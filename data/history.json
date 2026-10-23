@@ -1,0 +1,36 @@
+{
+  "updated": "2026-10-23T16:20:07Z",
+  "account": {
+    "email": "2011961478@qq.com"
+  },
+  "current": {
+    "points": 8.0,
+    "streak": 1,
+    "leftDays": 14.0,
+    "traffic": 6819872
+  },
+  "plans": [
+    {
+      "points": 100,
+      "days": 10
+    },
+    {
+      "points": 200,
+      "days": 30
+    },
+    {
+      "points": 500,
+      "days": 100
+    }
+  ],
+  "history": [
+    {
+      "date": "2026-10-24",
+      "ok": false,
+      "change": 0.0,
+      "balance": 8.0,
+      "streak": 1,
+      "leftDays": 14.0
+    }
+  ]
+}

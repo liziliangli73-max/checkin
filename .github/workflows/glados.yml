@@ -1,31 +1,42 @@
-# GLaDOS 每日签到
-# 每天北京时间 09:30 自动签到，也可在 Actions 页面手动运行
+# GLaDOS 每日签到 + 记录数据
 name: GLaDOS 签到
 
 on:
   schedule:
-    - cron: '30 1 * * *'      # UTC 01:30 = 北京时间 09:30
+    - cron: '30 1 * * *'      # UTC 01:30 = 北京 09:30
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   checkin:
     runs-on: ubuntu-latest
     steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
       - name: 准备 Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: 下载签到脚本
-        run: |
-          curl -sL -o checkin.py \
-            https://raw.githubusercontent.com/lankerr/2026-glados-checkin/main/checkin.py
-          wc -c checkin.py
-
       - name: 安装依赖
         run: pip install --quiet requests
 
-      - name: 执行签到
+      - name: 签到并记录
         env:
           GLADOS_COOKIE: ${{ secrets.GLADOS_COOKIE }}
         run: python checkin.py
+
+      - name: 提交数据
+        run: |
+          git config user.name "签到机器人"
+          git config user.email "bot@users.noreply.github.com"
+          git add data/history.json
+          if git diff --staged --quiet; then
+            echo "数据没变化"
+          else
+            git commit -m "签到记录 $(TZ=Asia/Shanghai date +%F)"
+            git push
+          fi
