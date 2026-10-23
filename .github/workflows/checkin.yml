@@ -1,5 +1,5 @@
-# GLaDOS 每日签到 + 记录数据
-name: GLaDOS 签到
+# 每日签到：GLaDOS + 网易云音乐
+name: 每日签到
 
 on:
   schedule:
@@ -10,30 +10,32 @@ permissions:
   contents: write
 
 jobs:
-  checkin:
+  run:
     runs-on: ubuntu-latest
     steps:
-      - name: 检出仓库
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: 准备 Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: 安装依赖
-        run: pip install --quiet requests
+      - run: pip install --quiet requests
 
-      - name: 签到并记录
+      - name: GLaDOS
         env:
           GLADOS_COOKIE: ${{ secrets.GLADOS_COOKIE }}
         run: python checkin.py
+
+      - name: 网易云音乐
+        env:
+          NETEASE_COOKIE: ${{ secrets.NETEASE_COOKIE }}
+        run: python netease.py
 
       - name: 提交数据
         run: |
           git config user.name "签到机器人"
           git config user.email "bot@users.noreply.github.com"
-          git add data/history.json
+          git add data/
           if git diff --staged --quiet; then
             echo "数据没变化"
           else
