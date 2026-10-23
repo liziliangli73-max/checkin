@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#faf9f5">
-<title>签到台</title>
+<title>签到台 · GLaDOS</title>
 <style>
 :root{
   --paper:#faf9f5; --ink:#1a1a17; --jade:#4b6f64;
-  --tint:#f3f2ec; --mute:#6b6b63; --line:#e6e4dc; --warn:#b4553f;
+  --tint:#f3f2ec; --mute:#6b6b63; --line:#e6e4dc;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
 body{
   margin:0;background:var(--paper);color:var(--ink);
   font:16px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
@@ -18,74 +19,74 @@ body{
 }
 .wrap{max-width:720px;margin:0 auto;padding:0 24px}
 
-header{padding:72px 0 32px}
-h1{font-size:44px;font-weight:600;letter-spacing:-.035em;line-height:1.1;margin:0 0 12px}
+/* 头部 */
+header{padding:72px 0 40px}
+h1{
+  font-size:44px;font-weight:600;letter-spacing:-.035em;
+  line-height:1.1;margin:0 0 12px;
+}
 .sub{color:var(--mute);font-size:15px;margin:0}
 .sub b{color:var(--jade);font-weight:500}
 
-/* 今日一句 */
-.dq{padding:0 0 36px}
-.dq .k{font-size:11.5px;letter-spacing:.3em;color:var(--mute);text-transform:uppercase;margin:0 0 14px}
-.dq .t{font-size:19px;font-weight:500;letter-spacing:.04em;line-height:1.9;margin:0 0 10px;color:var(--ink)}
-.dq .a{font-style:normal;font-size:12.5px;letter-spacing:.16em;color:var(--mute)}
-.dq[hidden]{display:none}
-
-/* 站点区块 */
-.site{padding:0 0 44px}
-.site-h{display:flex;align-items:center;gap:10px;margin:0 0 18px}
-.badge{
-  width:26px;height:26px;border-radius:8px;background:var(--tint);
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:600;color:var(--jade);flex:0 0 auto;
-}
-.badge.n{color:#c1476c}
-.site-h h2{font-size:19px;font-weight:600;letter-spacing:-.02em;margin:0}
-.site-h .meta{margin-left:auto;font-size:12px;color:var(--mute)}
-
 /* 数字卡 */
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);
-  border-radius:18px;overflow:hidden;margin:0 0 16px}
-.grid.g3{grid-template-columns:repeat(3,1fr)}
-.cell{padding:22px 20px;background:var(--paper)}
-.cell.alt{background:var(--tint)}
-.num{font-size:30px;font-weight:600;letter-spacing:-.03em;line-height:1;display:block}
-.lab{font-size:12.5px;color:var(--mute);margin-top:8px;display:block}
+.grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:1px;
+  background:var(--line);border-radius:20px;overflow:hidden;
+  margin:0 0 40px;
+}
+.cell{padding:26px 24px;background:var(--paper)}
+.cell:nth-child(odd){background:var(--tint)}
+.num{font-size:34px;font-weight:600;letter-spacing:-.03em;line-height:1;display:block}
+.num small{font-size:15px;font-weight:500;color:var(--mute);margin-left:3px}
+.lab{font-size:13px;color:var(--mute);margin-top:8px;display:block}
 .on{color:var(--jade)}
 .off{color:#b0aca0}
 
 /* 兑换进度 */
-.planbox{background:var(--tint);border-radius:18px;padding:22px 20px;margin:0 0 22px}
-.planbox h3{font-size:14px;font-weight:600;margin:0 0 4px}
-.planbox .hint{font-size:13px;color:var(--mute);margin:0 0 16px}
+.planbox{background:var(--tint);border-radius:20px;padding:28px 24px;margin:0 0 40px}
+.planbox h2{font-size:15px;font-weight:600;margin:0 0 4px}
+.planbox .hint{font-size:13px;color:var(--mute);margin:0 0 20px}
 .bar{height:6px;background:#e2e0d6;border-radius:99px;overflow:hidden;margin:0 0 10px}
-.bar i{display:block;height:100%;background:var(--jade);border-radius:99px;transition:width .5s}
-.barinfo{display:flex;justify-content:space-between;font-size:12.5px;color:var(--mute)}
+.bar i{display:block;height:100%;background:var(--jade);border-radius:99px;transition:width .5s ease}
+.barinfo{display:flex;justify-content:space-between;font-size:13px;color:var(--mute)}
 
-/* 表格 */
-h3.sec{font-size:13px;font-weight:500;color:var(--mute);letter-spacing:.1em;margin:0 0 10px}
+/* 历史 */
+h2.sec{font-size:19px;font-weight:600;letter-spacing:-.02em;margin:0 0 18px}
 table{width:100%;border-collapse:collapse;font-size:14px}
-th{text-align:left;font-weight:500;color:var(--mute);font-size:12px;padding:0 0 10px;border-bottom:1px solid var(--line)}
-td{padding:12px 0;border-bottom:1px solid var(--line)}
+th{
+  text-align:left;font-weight:500;color:var(--mute);font-size:12px;
+  padding:0 0 12px;border-bottom:1px solid var(--line);
+}
+td{padding:14px 0;border-bottom:1px solid var(--line)}
 tr:last-child td{border-bottom:0}
 td.r,th.r{text-align:right}
-.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--jade);
-  margin-right:7px;vertical-align:middle}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--jade);margin-right:7px;vertical-align:middle}
 .dot.no{background:#c9c4b4}
-.tag{display:inline-block;font-size:12px;padding:3px 10px;border-radius:99px;background:var(--tint);color:var(--mute)}
-.tag.ok{background:#e8f0ec;color:var(--jade)}
-.empty{padding:26px 0;color:var(--mute);font-size:13.5px}
-
-footer{padding:32px 0 72px;color:var(--mute);font-size:13px;line-height:1.8;border-top:1px solid var(--line)}
-footer a{color:var(--jade);text-decoration:none}
-
-@media(max-width:520px){
-  header{padding:48px 0 26px}
-  h1{font-size:34px}
-  .num{font-size:25px}
-  .cell{padding:18px 15px}
-  .wrap{padding:0 18px}
-  .grid.g3 .num{font-size:22px}
+.tag{
+  display:inline-block;font-size:12px;padding:3px 10px;border-radius:99px;
+  background:var(--tint);color:var(--mute);
 }
+.tag.ok{background:#e8f0ec;color:var(--jade)}
+footer{padding:48px 0 72px;color:var(--mute);font-size:13px;line-height:1.8}
+footer a{color:var(--jade);text-decoration:none}
+.empty{padding:40px 0;color:var(--mute);font-size:14px}
+@media(max-width:520px){
+  header{padding:48px 0 32px}
+  h1{font-size:34px}
+  .num{font-size:28px}
+  .cell{padding:22px 18px}
+  .wrap{padding:0 18px}
+}
+
+/* 今日一句 */
+.dq{padding:0 0 40px}
+.dq .k{font-size:11.5px;letter-spacing:.3em;color:var(--mute);
+  text-transform:uppercase;margin:0 0 14px}
+.dq .t{font-size:19px;font-weight:500;letter-spacing:.04em;line-height:1.9;
+  margin:0 0 10px;color:var(--ink)}
+.dq .a{font-style:normal;font-size:12.5px;letter-spacing:.16em;color:var(--mute)}
+.dq[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -93,57 +94,55 @@ footer a{color:var(--jade);text-decoration:none}
 
 <header>
   <h1>签到台</h1>
-  <p class="sub">每日签到 · 最近更新 <b id="updated">读取中</b></p>
+  <p class="sub">GLaDOS 每日签到 · 最近更新 <b id="updated">读取中</b></p>
 </header>
-
 <section class="dq" id="dq" hidden>
   <p class="k">今日一句</p>
   <blockquote class="t" id="dqT"></blockquote>
   <cite class="a" id="dqA"></cite>
 </section>
 
-<section class="site">
-  <div class="site-h">
-    <span class="badge">G</span>
-    <h2>GLaDOS</h2>
-    <span class="meta" id="gMeta"></span>
-  </div>
-  <div class="grid">
-    <div class="cell"><span class="num" id="gStreak">—</span><span class="lab">连续签到（天）</span></div>
-    <div class="cell alt"><span class="num" id="gPoints">—</span><span class="lab">当前积分</span></div>
-    <div class="cell alt"><span class="num" id="gDays">—</span><span class="lab">剩余天数</span></div>
-    <div class="cell"><span class="num" id="gToday">—</span><span class="lab">今日签到</span></div>
-  </div>
-  <div class="planbox">
-    <h3>距离下一档兑换</h3>
-    <p class="hint" id="gHint">—</p>
-    <div class="bar"><i id="gBar" style="width:0%"></i></div>
-    <div class="barinfo"><span id="gCur">0 积分</span><span id="gGoal">—</span></div>
-  </div>
-  <h3 class="sec">签到记录</h3>
-  <table>
-    <thead><tr><th>日期</th><th>结果</th><th class="r">积分</th><th class="r">余额</th></tr></thead>
-    <tbody id="gRows"><tr><td colspan="4" class="empty">读取中…</td></tr></tbody>
-  </table>
-</section>
 
-<section class="site">
-  <div class="site-h">
-    <span class="badge n">♪</span>
-    <h2>网易云音乐</h2>
-    <span class="meta" id="nMeta"></span>
+<div class="grid">
+  <div class="cell">
+    <span class="num" id="streak">—</span>
+    <span class="lab">连续签到（天）</span>
   </div>
-  <div class="grid g3">
-    <div class="cell"><span class="num" id="nToday">—</span><span class="lab">今日签到</span></div>
-    <div class="cell alt"><span class="num" id="nStreak">—</span><span class="lab">连续（天）</span></div>
-    <div class="cell"><span class="num" id="nTotal">—</span><span class="lab">累计（次）</span></div>
+  <div class="cell">
+    <span class="num" id="points">—</span>
+    <span class="lab">当前积分</span>
   </div>
-  <h3 class="sec">签到记录</h3>
-  <table>
-    <thead><tr><th>日期</th><th>结果</th><th class="r">积分</th></tr></thead>
-    <tbody id="nRows"><tr><td colspan="3" class="empty">读取中…</td></tr></tbody>
-  </table>
-</section>
+  <div class="cell">
+    <span class="num" id="leftdays">—</span>
+    <span class="lab">剩余天数</span>
+  </div>
+  <div class="cell">
+    <span class="num" id="today">—</span>
+    <span class="lab">今日签到</span>
+  </div>
+</div>
+
+<div class="planbox">
+  <h2>距离下一档兑换</h2>
+  <p class="hint" id="planhint">—</p>
+  <div class="bar"><i id="barfill" style="width:0%"></i></div>
+  <div class="barinfo">
+    <span id="cur">0 积分</span>
+    <span id="goal">—</span>
+  </div>
+</div>
+
+<h2 class="sec">签到记录</h2>
+<table>
+  <thead>
+    <tr>
+      <th>日期</th><th>结果</th><th class="r">积分</th><th class="r">余额</th>
+    </tr>
+  </thead>
+  <tbody id="rows">
+    <tr><td colspan="4" class="empty">正在读取数据…</td></tr>
+  </tbody>
+</table>
 
 <footer>
   数据每天 09:30 由 GitHub Actions 自动签到后写入。<br>
@@ -155,142 +154,109 @@ footer a{color:var(--jade);text-decoration:none}
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
-  function nums(v) { var n = Number(v); return isFinite(n) ? n : 0; }
-  function todayCN() { return new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10); }
-  function fmt(iso) {
-    if (!iso) return '';
-    try {
-      return new Date(iso).toLocaleString('zh-CN',
-        { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-    } catch (e) { return ''; }
-  }
-  function streakOf(hist) {
-    if (!hist || !hist.length) return 0;
-    var set = {}, i;
-    for (i = 0; i < hist.length; i++) if (hist[i].ok) set[hist[i].date] = 1;
-    var n = 0, d = new Date(Date.now() + 8 * 3600e3);
-    for (i = 0; i < 400; i++) {
-      var s = d.toISOString().slice(0, 10);
-      if (set[s]) { n++; d = new Date(d.getTime() - 864e5); }
-      else if (i === 0) { d = new Date(d.getTime() - 864e5); }
-      else break;
-    }
-    return n;
+
+  function nums(v) {
+    var n = Number(v);
+    return isFinite(n) ? n : 0;
   }
 
-  // 今日一句
-  fetch('https://raw.githubusercontent.com/liziliangli73-max/mysite/master/daily/quote.json?v=' + Date.now())
-    .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
-    .then(function (d) {
-      $('dqT').textContent = d.text;
-      $('dqA').textContent = '—— ' + d.author;
-      $('dq').hidden = false;
-    })
-    .catch(function () { $('dq').hidden = true; });
-
-  // GLaDOS
   fetch('data/history.json?v=' + Date.now())
     .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
-    .then(renderG)
+    .then(render)
     .catch(function () {
-      $('gRows').innerHTML = '<tr><td colspan="4" class="empty">还没有数据</td></tr>';
+      $('rows').innerHTML = '<tr><td colspan="4" class="empty">还没有数据 —— 等第一次自动签到后再来看</td></tr>';
+      $('updated').textContent = '暂无数据';
     });
 
-  function renderG(d) {
+  function render(d) {
     var cur = d.current || {};
     var hist = (d.history || []).slice().reverse();
-    var t = todayCN(), todayRow = null, i;
-    for (i = 0; i < hist.length; i++) if (hist[i].date === t) { todayRow = hist[i]; break; }
-
-    $('gStreak').textContent = nums(cur.streak);
-    $('gPoints').textContent = nums(cur.points).toFixed(0);
-    $('gDays').textContent = nums(cur.leftDays).toFixed(0);
-    var el = $('gToday');
-    el.textContent = todayRow ? (todayRow.ok ? '已签' : '未成') : '未签';
-    el.className = 'num ' + ((todayRow && todayRow.ok) ? 'on' : 'off');
-    $('gMeta').textContent = d.updated ? fmt(d.updated) : '';
-
-    var plans = (d.plans || []).slice().sort(function (a, b) { return a.points - b.points; });
-    var pts = nums(cur.points), next = null;
-    for (i = 0; i < plans.length; i++) if (plans[i].points > pts) { next = plans[i]; break; }
-    if (next) {
-      $('gHint').textContent = '再攒 ' + (next.points - pts) + ' 分，可换 ' + next.days + ' 天';
-      $('gBar').style.width = Math.min(100, pts / next.points * 100).toFixed(1) + '%';
-      $('gCur').textContent = pts.toFixed(0) + ' 积分';
-      $('gGoal').textContent = next.points + ' → ' + next.days + ' 天';
-    } else if (plans.length) {
-      var top = plans[plans.length - 1];
-      $('gHint').textContent = '已达最高档，可兑换 ' + top.days + ' 天';
-      $('gBar').style.width = '100%';
-      $('gCur').textContent = pts.toFixed(0) + ' 积分';
-      $('gGoal').textContent = top.points + ' → ' + top.days + ' 天';
-    } else {
-      $('gHint').textContent = '暂无兑换档位';
+    var todayStr = new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
+    var todayRow = null;
+    for (var i = 0; i < hist.length; i++) {
+      if (hist[i].date === todayStr) { todayRow = hist[i]; break; }
     }
 
+    $('streak').textContent   = nums(cur.streak);
+    $('points').textContent   = nums(cur.points).toFixed(0);
+    $('leftdays').textContent = nums(cur.leftDays).toFixed(0);
+
+    var t = $('today');
+    if (todayRow) {
+      t.textContent = todayRow.ok ? '已签' : '未成';
+      t.className = 'num ' + (todayRow.ok ? 'on' : 'off');
+    } else {
+      t.textContent = '未签';
+      t.className = 'num off';
+    }
+
+    if (d.updated) {
+      var dt = new Date(d.updated);
+      $('updated').textContent = dt.toLocaleString('zh-CN', {
+        month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    // 兑换档位
+    var plans = (d.plans || []).slice().sort(function (a, b) { return a.points - b.points; });
+    var pts = nums(cur.points);
+    var next = null;
+    for (var j = 0; j < plans.length; j++) {
+      if (plans[j].points > pts) { next = plans[j]; break; }
+    }
+    if (next) {
+      var pct = Math.min(100, pts / next.points * 100);
+      $('planhint').textContent = '再攒 ' + (next.points - pts) + ' 分，可换 ' + next.days + ' 天';
+      $('barfill').style.width = pct.toFixed(1) + '%';
+      $('cur').textContent  = pts.toFixed(0) + ' 积分';
+      $('goal').textContent = next.points + ' → ' + next.days + ' 天';
+    } else if (plans.length) {
+      var top = plans[plans.length - 1];
+      $('planhint').textContent = '已达最高档，可兑换 ' + top.days + ' 天';
+      $('barfill').style.width = '100%';
+      $('cur').textContent  = pts.toFixed(0) + ' 积分';
+      $('goal').textContent = top.points + ' → ' + top.days + ' 天';
+    }
+
+    // 表格
     if (!hist.length) {
-      $('gRows').innerHTML = '<tr><td colspan="4" class="empty">还没有记录</td></tr>';
+      $('rows').innerHTML = '<tr><td colspan="4" class="empty">还没有记录</td></tr>';
       return;
     }
     var html = '';
-    for (i = 0; i < Math.min(hist.length, 60); i++) {
-      var h = hist[i];
+    for (var k = 0; k < Math.min(hist.length, 60); k++) {
+      var h = hist[k];
+      var okCls = h.ok ? 'ok' : '';
+      var label = h.ok ? '成功' : '失败';
       html += '<tr>'
         + '<td><span class="dot ' + (h.ok ? '' : 'no') + '"></span>' + h.date + '</td>'
-        + '<td><span class="tag ' + (h.ok ? 'ok' : '') + '">' + (h.ok ? '成功' : '失败') + '</span></td>'
+        + '<td><span class="tag ' + okCls + '">' + label + '</span></td>'
         + '<td class="r">' + (h.ok ? '+' + nums(h.change).toFixed(0) : '—') + '</td>'
         + '<td class="r">' + nums(h.balance).toFixed(0) + '</td>'
         + '</tr>';
     }
-    $('gRows').innerHTML = html;
+    $('rows').innerHTML = html;
 
     var parts = location.pathname.split('/');
     var repo = location.hostname.split('.')[0] + '/' + (parts[1] || 'checkin');
     $('repolink').href = 'https://github.com/' + repo;
     $('repolink').textContent = repo;
   }
+})();
+</script>
 
-  // 网易云
-  fetch('data/netease.json?v=' + Date.now())
-    .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
-    .then(renderN)
-    .catch(function () {
-      $('nRows').innerHTML = '<tr><td colspan="3" class="empty">还没有数据</td></tr>';
-    });
-
-  function renderN(d) {
-    var hist = (d.history || []).slice().reverse();
-    var t = todayCN(), todayRow = null, i;
-    for (i = 0; i < hist.length; i++) if (hist[i].date === t) { todayRow = hist[i]; break; }
-
-    var el = $('nToday');
-    el.textContent = todayRow ? (todayRow.ok ? '已签' : '未成') : '未签';
-    el.className = 'num ' + ((todayRow && todayRow.ok) ? 'on' : 'off');
-    $('nStreak').textContent = streakOf(d.history);
-    $('nTotal').textContent = (d.history || []).filter(function (x) { return x.ok; }).length;
-    $('nMeta').textContent = d.updated ? fmt(d.updated) : '';
-
-    if (!hist.length) {
-      $('nRows').innerHTML = '<tr><td colspan="3" class="empty">还没有记录</td></tr>';
-      return;
-    }
-    var html = '';
-    for (i = 0; i < Math.min(hist.length, 60); i++) {
-      var h = hist[i];
-      html += '<tr>'
-        + '<td><span class="dot ' + (h.ok ? '' : 'no') + '"></span>' + h.date + '</td>'
-        + '<td><span class="tag ' + (h.ok ? 'ok' : '') + '">' + (h.ok ? '成功' : '失败') + '</span></td>'
-        + '<td class="r">' + (h.point ? '+' + h.point : '—') + '</td>'
-        + '</tr>';
-    }
-    $('nRows').innerHTML = html;
-  }
-
-  // 整体更新时间
-  fetch('data/history.json?v=' + Date.now())
-    .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
-    .then(function (d) { if (d.updated) $('updated').textContent = fmt(d.updated); })
-    .catch(function () { $('updated').textContent = '暂无数据'; });
+<script>
+(function(){
+  var box = document.getElementById('dq');
+  if (!box) return;
+  fetch('https://raw.githubusercontent.com/liziliangli73-max/mysite/master/daily/quote.json?v=' + Date.now())
+    .then(function(r){ return r.ok ? r.json() : Promise.reject(); })
+    .then(function(d){
+      document.getElementById('dqT').textContent = d.text;
+      document.getElementById('dqA').textContent = '—— ' + d.author;
+      box.hidden = false;
+    })
+    .catch(function(){ box.hidden = true; });
 })();
 </script>
 </body>
