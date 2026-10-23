@@ -78,6 +78,15 @@ footer a{color:var(--jade);text-decoration:none}
   .cell{padding:22px 18px}
   .wrap{padding:0 18px}
 }
+
+/* 今日一句 */
+.dq{padding:0 0 40px}
+.dq .k{font-size:11.5px;letter-spacing:.3em;color:var(--mute);
+  text-transform:uppercase;margin:0 0 14px}
+.dq .t{font-size:19px;font-weight:500;letter-spacing:.04em;line-height:1.9;
+  margin:0 0 10px;color:var(--ink)}
+.dq .a{font-style:normal;font-size:12.5px;letter-spacing:.16em;color:var(--mute)}
+.dq[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -87,6 +96,12 @@ footer a{color:var(--jade);text-decoration:none}
   <h1>签到台</h1>
   <p class="sub">GLaDOS 每日签到 · 最近更新 <b id="updated">读取中</b></p>
 </header>
+<section class="dq" id="dq" hidden>
+  <p class="k">今日一句</p>
+  <blockquote class="t" id="dqT"></blockquote>
+  <cite class="a" id="dqA"></cite>
+</section>
+
 
 <div class="grid">
   <div class="cell">
@@ -227,6 +242,21 @@ footer a{color:var(--jade);text-decoration:none}
     $('repolink').href = 'https://github.com/' + repo;
     $('repolink').textContent = repo;
   }
+})();
+</script>
+
+<script>
+(function(){
+  var box = document.getElementById('dq');
+  if (!box) return;
+  fetch('https://raw.githubusercontent.com/liziliangli73-max/mysite/master/daily/quote.json?v=' + Date.now())
+    .then(function(r){ return r.ok ? r.json() : Promise.reject(); })
+    .then(function(d){
+      document.getElementById('dqT').textContent = d.text;
+      document.getElementById('dqA').textContent = '—— ' + d.author;
+      box.hidden = false;
+    })
+    .catch(function(){ box.hidden = true; });
 })();
 </script>
 </body>
