@@ -11,7 +11,7 @@ if not COOKIE:
 BASE = "https://glados.network"
 HEAD = {
     "Cookie": COOKIE,
-    "User-Agent": "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126.0.0.0 Mobile Safari/537.36",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "application/json, text/plain, */*",
     "Referer": BASE + "/console",
 }
@@ -45,7 +45,10 @@ if os.path.exists(DATA):
         pass
 doc.setdefault("history", [])
 
-ok = res.get("code") == 0
+code = res.get("code")
+msg = ((res.get("message") or "") + " " + (res.get("reason") or "")).lower()
+already = ("return tomorrow" in msg) or ("already" in msg) or (code == 1)
+ok = (code == 0) or already
 change = 0.0
 if ok:
     try:
