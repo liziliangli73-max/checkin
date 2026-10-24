@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # GLaDOS 每日签到 + 记录数据（供网页统计）
 # 退出码：0 = 签到成功或当天已签（无需再跑）；2 = 签到失败（需要人工看一眼）
-import os, json, sys
+import os, json, sys, time
 from datetime import datetime, timezone, timedelta
 import requests
 
@@ -31,8 +31,22 @@ def now_iso():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+CHECKED_GAP_H = 4      # 「最近检查」最多 4 小时刷新一次，避免一天几十条提交
+
+
+def checked_stale(doc):
+    old = doc.get("checked")
+    if not old:
+        return True
+    try:
+        t = datetime.strptime(old, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    except Exception:
+        return True
+    return (datetime.now(timezone.utc) - t).total_seconds() > CHECKED_GAP_H * 3600
+
+
 def save_doc(doc):
-    """写盘：updated 只在真正签到写入时变，checked 每次运行都变"""
+    """写盘：updated 只在真正签到写入时变，checked 按 4 小时间隔刷新"""
     doc["checked"] = now_iso()
     os.makedirs("data", exist_ok=True)
     with open(DATA, "w", encoding="utf-8") as f:
@@ -47,7 +61,10 @@ if not FORCE:
     for h in doc["history"]:
         if h.get("date") == today and h.get("ok"):
             print(f"{today} 已有成功记录（+{h.get('change')} 积分），本次跳过")
-            save_doc(doc)          # 只刷新「最近检查」，页面据此知道任务还活着
+            if checked_stale(doc):
+                save_doc(doc)      # 只刷新「最近检查」，页面据此知道任务还活着
+            else:
+                print("「最近检查」4 小时内已刷新过，本次不写文件")
             sys.exit(0)
 
 COOKIE = os.environ.get("GLADOS_COOKIE", "").strip()
@@ -63,12 +80,24 @@ HEAD = {
     "Referer": BASE + "/console",
 }
 
-def call(path, method="GET"):
-    r = requests.request(method, BASE + path, headers=HEAD, timeout=30)
-    try:
-        return r.json()
-    except Exception:
-        return {"code": -1, "raw": r.text[:200]}
+def call(path, method="GET", tries=3):
+    """网络抖动或 5xx 时自动重试，最多 3 次"""
+    err = ""
+    for i in range(tries):
+        try:
+            r = requests.request(method, BASE + path, headers=HEAD, timeout=25)
+            if r.status_code >= 500:
+                raise requests.RequestException(f"HTTP {r.status_code}")
+            try:
+                return r.json()
+            except Exception:
+                return {"code": -1, "raw": r.text[:200]}
+        except requests.RequestException as e:
+            err = str(e)
+            print(f"  请求失败（第 {i+1}/{tries} 次）：{e}")
+            if i + 1 < tries:
+                time.sleep(8)
+    return {"code": -1, "error": err}
 
 res  = call("/api/user/checkin", "POST")
 st   = call("/api/user/status").get("data") or {}

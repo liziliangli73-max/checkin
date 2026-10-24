@@ -3,14 +3,16 @@ name: GLaDOS 签到
 
 on:
   schedule:
-    # 一天六个时段：GitHub 的 cron 常常延迟几小时、偶尔整次丢掉，
-    # 多排几个点，漏掉前面还有后面兜底。当天已签会自动跳过，不会重复签。
+    # GitHub 的 cron 是「尽力而为」：会延迟几小时，也可能整次丢掉。
+    # 唯一能自己控制的办法就是多排几个点，靠数量兜住。当天已签会自动跳过。
     - cron: '0 22 * * *'      # 北京 06:00
+    - cron: '30 0 * * *'      # 北京 08:30
     - cron: '30 1 * * *'      # 北京 09:30
-    - cron: '0 5 * * *'       # 北京 13:00
-    - cron: '0 8 * * *'       # 北京 16:00
-    - cron: '0 11 * * *'      # 北京 19:00
-    - cron: '0 13 * * *'      # 北京 21:00
+    - cron: '0 4 * * *'       # 北京 12:00
+    - cron: '30 6 * * *'      # 北京 14:30
+    - cron: '0 9 * * *'       # 北京 17:00
+    - cron: '30 11 * * *'     # 北京 19:30
+    - cron: '30 13 * * *'     # 北京 21:30
   push:
     # 只在本文件被改动时自测一次，确认流程没坏（日常签到仍靠 schedule）
     paths:
@@ -34,6 +36,7 @@ concurrency:
 jobs:
   checkin:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: 检出仓库
         uses: actions/checkout@v4
