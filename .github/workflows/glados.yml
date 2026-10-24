@@ -7,6 +7,10 @@ on:
     - cron: '30 1 * * *'      # UTC 01:30 = 北京 09:30
     - cron: '30 5 * * *'      # UTC 05:30 = 北京 13:30
     - cron: '30 12 * * *'     # UTC 12:30 = 北京 20:30
+  push:
+    # 只在本文件被改动时自测一次，确认流程没坏（日常签到仍靠 schedule）
+    paths:
+      - '.github/workflows/glados.yml'
   workflow_dispatch:
     inputs:
       force:
