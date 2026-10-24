@@ -1,12 +1,45 @@
 #!/usr/bin/env python3
 # GLaDOS 每日签到 + 记录数据（供网页统计）
+# 退出码：0 = 签到成功或当天已签（无需再跑）；2 = 签到失败（需要人工看一眼）
 import os, json, sys
 from datetime import datetime, timezone, timedelta
 import requests
 
+DATA = "data/history.json"
+FORCE = os.environ.get("FORCE_CHECKIN", "").strip().lower() in ("1", "true", "yes")
+
+
+def bj_today():
+    return datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d")
+
+
+def load_doc():
+    doc = None
+    if os.path.exists(DATA):
+        try:
+            with open(DATA, encoding="utf-8") as f:
+                doc = json.load(f)
+        except Exception:
+            doc = None
+    if not isinstance(doc, dict):
+        doc = {"updated": "", "account": {}, "current": {}, "plans": [], "history": []}
+    doc.setdefault("history", [])
+    return doc
+
+
+today = bj_today()
+
+# 一天只需要签一次：当天已成功就跳过，省掉重复请求，也不会产生空提交
+if not FORCE:
+    for h in load_doc()["history"]:
+        if h.get("date") == today and h.get("ok"):
+            print(f"{today} 已有成功记录（+{h.get('change')} 积分），本次跳过")
+            sys.exit(0)
+
 COOKIE = os.environ.get("GLADOS_COOKIE", "").strip()
 if not COOKIE:
-    print("错误：缺少 GLADOS_COOKIE"); sys.exit(1)
+    print("错误：缺少 GLADOS_COOKIE（仓库 secret 没配或已失效）")
+    sys.exit(2)
 
 BASE = "https://glados.network"
 HEAD = {
@@ -15,7 +48,6 @@ HEAD = {
     "Accept": "application/json, text/plain, */*",
     "Referer": BASE + "/console",
 }
-DATA = "data/history.json"
 
 def call(path, method="GET"):
     r = requests.request(method, BASE + path, headers=HEAD, timeout=30)
@@ -35,15 +67,8 @@ plans_raw = pt.get("plans") or {}
 left_days = float(st.get("leftDays") or 0)
 traffic   = int(st.get("traffic") or 0)
 email     = st.get("email") or ""
-today     = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d")
 
-doc = {"updated": "", "account": {}, "current": {}, "plans": [], "history": []}
-if os.path.exists(DATA):
-    try:
-        doc = json.load(open(DATA, encoding="utf-8"))
-    except Exception:
-        pass
-doc.setdefault("history", [])
+doc = load_doc()
 
 code = res.get("code")
 msg = ((res.get("message") or "") + " " + (res.get("reason") or "")).lower()
@@ -61,23 +86,41 @@ if ok:
                 try: change = float(h.get("change") or 0)
                 except Exception: pass
 
-doc["account"] = {"email": email}
-doc["current"] = {"points": points, "streak": streak,
-                  "leftDays": left_days, "traffic": traffic}
-doc["plans"] = ([{"points": v.get("points"), "days": v.get("days")}
-                 for v in plans_raw.values()] if isinstance(plans_raw, dict) else [])
-doc["updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-row = {"date": today, "ok": ok, "change": change,
-       "balance": points, "streak": streak, "leftDays": left_days}
 hist = doc["history"]
-for i, h in enumerate(hist):
-    if h.get("date") == today:
-        hist[i] = row; break
+prev_row = next((h for h in hist if h.get("date") == today), None)
+got_profile = bool(email or points or streak or left_days)
+
+# 接口没给出账号信息（cookie 失效/失败）时，别用 0 覆盖上一次的好数据
+if got_profile or not doc.get("current"):
+    doc["account"] = {"email": email or (doc.get("account") or {}).get("email") or ""}
+    doc["current"] = {"points": points, "streak": streak,
+                      "leftDays": left_days, "traffic": traffic}
+    doc["plans"] = ([{"points": v.get("points"), "days": v.get("days")}
+                     for v in plans_raw.values()] if isinstance(plans_raw, dict) else [])
 else:
-    hist.append(row)
-doc["history"] = sorted(hist, key=lambda x: x.get("date", ""))[-180:]
+    print("接口没返回账号信息，保留上一次的积分/天数")
+
+# 已经成功的当天记录不会被后来的失败覆盖（避免重试把「已签」改回「失败」）
+if ok or not (prev_row and prev_row.get("ok")):
+    row = {"date": today, "ok": ok, "change": change,
+           "balance": points, "streak": streak, "leftDays": left_days}
+    for i, h in enumerate(hist):
+        if h.get("date") == today:
+            hist[i] = row; break
+    else:
+        hist.append(row)
+    doc["history"] = sorted(hist, key=lambda x: x.get("date", ""))[-180:]
+    doc["updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+else:
+    print("今天已有成功记录，本次失败不覆盖，页面数据保持不变")
 
 os.makedirs("data", exist_ok=True)
-json.dump(doc, open(DATA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+with open(DATA, "w", encoding="utf-8") as f:
+    json.dump(doc, f, ensure_ascii=False, indent=2)
+
+if os.environ.get("GITHUB_OUTPUT"):
+    with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+        f.write(f"ok={'true' if ok else 'false'}\n")
+
 print(f"{today}: 签到={ok} +{change} 积分 | 余额={points} 连续={streak}天 剩余={left_days}天")
+sys.exit(0 if ok else 2)

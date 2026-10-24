@@ -3,11 +3,24 @@ name: GLaDOS 签到
 
 on:
   schedule:
+    # 一天三个时段，前面漏跑后面能补上；当天已成功则脚本自动跳过
     - cron: '30 1 * * *'      # UTC 01:30 = 北京 09:30
+    - cron: '30 5 * * *'      # UTC 05:30 = 北京 13:30
+    - cron: '30 12 * * *'     # UTC 12:30 = 北京 20:30
   workflow_dispatch:
+    inputs:
+      force:
+        description: '当天已签到也强制再跑一次（排查用）'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
+  issues: write
+
+concurrency:
+  group: glados-checkin
+  cancel-in-progress: false
 
 jobs:
   checkin:
@@ -25,8 +38,11 @@ jobs:
         run: pip install --quiet requests
 
       - name: 签到并记录
+        id: checkin
+        continue-on-error: true
         env:
           GLADOS_COOKIE: ${{ secrets.GLADOS_COOKIE }}
+          FORCE_CHECKIN: ${{ github.event_name == 'workflow_dispatch' && inputs.force && '1' || '' }}
         run: python checkin.py
 
       - name: 提交数据
@@ -40,3 +56,24 @@ jobs:
             git commit -m "签到记录 $(TZ=Asia/Shanghai date +%F)"
             git push
           fi
+
+      - name: 失败时开 issue 提醒
+        if: steps.checkin.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TITLE="签到失败 $(TZ=Asia/Shanghai date +%F)"
+          if gh issue list --state open --search "$TITLE in:title" --json title --jq '.[].title' | grep -qx "$TITLE"; then
+            echo "已有未关闭的同类提醒，跳过"
+          else
+            gh issue create --title "$TITLE" \
+              --body "自动签到没成功，运行日志：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          常见原因：COOKIE 过期、站点改版、网络抖动。当天后面几个时段还会自动重试。"
+          fi
+
+      - name: 标记本次失败
+        if: steps.checkin.outcome == 'failure'
+        run: |
+          echo "签到失败（退出码 2），详见上面「签到并记录」的日志。"
+          exit 1
