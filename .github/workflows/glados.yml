@@ -20,6 +20,7 @@ on:
 permissions:
   contents: write
   issues: write
+  pages: write
 
 concurrency:
   group: glados-checkin
@@ -49,6 +50,7 @@ jobs:
         run: python checkin.py
 
       - name: 提交数据
+        id: commit
         run: |
           git config user.name "签到机器人"
           git config user.email "bot@users.noreply.github.com"
@@ -58,7 +60,17 @@ jobs:
           else
             git commit -m "签到记录 $(TZ=Asia/Shanghai date +%F)"
             git push
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: 触发 Pages 重新构建
+        # 机器人用 GITHUB_TOKEN 推的 commit 不会自动触发 Pages 部署，这里手动点一次
+        if: steps.commit.outputs.pushed == 'true' || github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "请求 Pages 重建…"
+          gh api --method POST "/repos/${GITHUB_REPOSITORY}/pages/builds" --jq '{status: .status, url: .url}'
 
       - name: 失败时开 issue 提醒
         if: steps.checkin.outcome == 'failure'
