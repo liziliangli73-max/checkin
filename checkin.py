@@ -27,13 +27,27 @@ def load_doc():
     return doc
 
 
+def now_iso():
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def save_doc(doc):
+    """写盘：updated 只在真正签到写入时变，checked 每次运行都变"""
+    doc["checked"] = now_iso()
+    os.makedirs("data", exist_ok=True)
+    with open(DATA, "w", encoding="utf-8") as f:
+        json.dump(doc, f, ensure_ascii=False, indent=2)
+
+
 today = bj_today()
 
-# 一天只需要签一次：当天已成功就跳过，省掉重复请求，也不会产生空提交
+# 一天只需要签一次：当天已成功就跳过，省掉重复请求
 if not FORCE:
-    for h in load_doc()["history"]:
+    doc = load_doc()
+    for h in doc["history"]:
         if h.get("date") == today and h.get("ok"):
             print(f"{today} 已有成功记录（+{h.get('change')} 积分），本次跳过")
+            save_doc(doc)          # 只刷新「最近检查」，页面据此知道任务还活着
             sys.exit(0)
 
 COOKIE = os.environ.get("GLADOS_COOKIE", "").strip()
@@ -110,13 +124,11 @@ if ok or not (prev_row and prev_row.get("ok")):
     else:
         hist.append(row)
     doc["history"] = sorted(hist, key=lambda x: x.get("date", ""))[-180:]
-    doc["updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    doc["updated"] = now_iso()
 else:
     print("今天已有成功记录，本次失败不覆盖，页面数据保持不变")
 
-os.makedirs("data", exist_ok=True)
-with open(DATA, "w", encoding="utf-8") as f:
-    json.dump(doc, f, ensure_ascii=False, indent=2)
+save_doc(doc)
 
 if os.environ.get("GITHUB_OUTPUT"):
     with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:

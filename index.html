@@ -27,6 +27,8 @@ h1{
 }
 .sub{color:var(--mute);font-size:15px;margin:0}
 .sub b{color:var(--jade);font-weight:500}
+.sub+.sub{margin-top:8px;font-size:13px}
+.sub.bad b{color:#c2603f}
 
 /* 数字卡 */
 .grid{
@@ -95,6 +97,7 @@ footer a{color:var(--jade);text-decoration:none}
 <header>
   <h1>签到台</h1>
   <p class="sub">GLaDOS 每日签到 · 最近更新 <b id="updated">读取中</b></p>
+  <p class="sub" id="checkedline" hidden>最近检查 <b id="checked">—</b></p>
 </header>
 <section class="dq" id="dq" hidden>
   <p class="k">今日一句</p>
@@ -145,7 +148,7 @@ footer a{color:var(--jade);text-decoration:none}
 </table>
 
 <footer>
-  数据每天 09:30 由 GitHub Actions 自动签到后写入。<br>
+  数据每天 09:30 由 GitHub Actions 自动签到，20:30 兜底补跑。<br>
   仓库：<a id="repolink" href="#">checkin</a>
 </footer>
 
@@ -158,6 +161,14 @@ footer a{color:var(--jade);text-decoration:none}
   function nums(v) {
     var n = Number(v);
     return isFinite(n) ? n : 0;
+  }
+
+  function fmtTime(v) {
+    var d = new Date(v);
+    if (!v || isNaN(d.getTime())) return '—';
+    return d.toLocaleString('zh-CN', {
+      month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
   }
 
   fetch('data/history.json?v=' + Date.now())
@@ -191,10 +202,19 @@ footer a{color:var(--jade);text-decoration:none}
     }
 
     if (d.updated) {
-      var dt = new Date(d.updated);
-      $('updated').textContent = dt.toLocaleString('zh-CN', {
-        month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
-      });
+      $('updated').textContent = fmtTime(d.updated);
+    }
+
+    // 最近检查：每次自动任务运行都会刷新（哪怕当天已签、没动数据）
+    if (d.checked) {
+      var chk = new Date(d.checked);
+      var line = $('checkedline');
+      $('checked').textContent = fmtTime(d.checked);
+      line.hidden = false;
+      if (Date.now() - chk.getTime() > 36 * 3600e3) {
+        line.className = 'sub bad';
+        $('checked').textContent += '（超过 36 小时没动静，去 Actions 看看）';
+      }
     }
 
     // 兑换档位
