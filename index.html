@@ -29,6 +29,8 @@ h1{
 .sub b{color:var(--jade);font-weight:500}
 .sub+.sub{margin-top:8px;font-size:13px}
 .sub.bad b{color:#c2603f}
+.fixline{color:#c2603f}
+.fixline a{color:#c2603f;text-decoration:underline}
 
 /* 数字卡 */
 .grid{
@@ -125,6 +127,10 @@ footer a{color:var(--jade);text-decoration:none}
   </div>
 </div>
 
+<p class="sub fixline" id="fixline" hidden>
+  今天还没签上 → <a href="https://github.com/liziliangli73-max/checkin/actions/workflows/glados.yml" target="_blank" rel="noopener">去手动补签</a>（登录后点 Run workflow）
+</p>
+
 <div class="planbox">
   <h2>距离下一档兑换</h2>
   <p class="hint" id="planhint">—</p>
@@ -200,6 +206,7 @@ footer a{color:var(--jade);text-decoration:none}
       t.textContent = '未签';
       t.className = 'num off';
     }
+    $('fixline').hidden = !!(todayRow && todayRow.ok);
 
     if (d.updated) {
       $('updated').textContent = fmtTime(d.updated);
