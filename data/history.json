@@ -1,13 +1,13 @@
 {
-  "updated": "2026-10-24T23:56:08Z",
+  "updated": "2026-10-25T17:07:26Z",
   "account": {
     "email": "2011961478@qq.com"
   },
   "current": {
-    "points": 12.0,
-    "streak": 2,
-    "leftDays": 13.0,
-    "traffic": 723633704
+    "points": 22.0,
+    "streak": 3,
+    "leftDays": 12.0,
+    "traffic": 1166864186
   },
   "plans": [
     {
@@ -39,7 +39,15 @@
       "balance": 12.0,
       "streak": 2,
       "leftDays": 13.0
+    },
+    {
+      "date": "2026-10-26",
+      "ok": true,
+      "change": 10.0,
+      "balance": 22.0,
+      "streak": 3,
+      "leftDays": 12.0
     }
   ],
-  "checked": "2026-10-25T11:54:30Z"
+  "checked": "2026-10-25T17:07:26Z"
 }
