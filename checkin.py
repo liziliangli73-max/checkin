@@ -145,8 +145,17 @@ else:
 
 # 已经成功的当天记录不会被后来的失败覆盖（避免重试把「已签」改回「失败」）
 if ok or not (prev_row and prev_row.get("ok")):
-    row = {"date": today, "ok": ok, "change": change,
-           "balance": points, "streak": streak, "leftDays": left_days}
+    if ok:
+        row = {"date": today, "ok": True, "change": change,
+               "balance": points, "streak": streak, "leftDays": left_days}
+    else:
+        # 失败时别写 0，否则表格看着像积分归零；保留上次已知值
+        row = {"date": today, "ok": False, "change": 0.0, "error": str(res.get("message") or res.get("error") or "")[:80]}
+        prev_c = doc.get("current") or {}
+        if prev_c:
+            row["balance"] = prev_c.get("points")
+            row["streak"] = prev_c.get("streak")
+            row["leftDays"] = prev_c.get("leftDays")
     for i, h in enumerate(hist):
         if h.get("date") == today:
             hist[i] = row; break

@@ -90,9 +90,17 @@ jobs:
             echo "已有未关闭的同类提醒，跳过"
           else
             gh issue create --title "$TITLE" \
-              --body "自动签到没成功，运行日志：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+              --body "自动签到没成功（GLaDOS 返回「没有权限」，通常是 cookie 过期或被顶掉）。
 
-          常见原因：COOKIE 过期、站点改版、网络抖动。当天后面几个时段还会自动重试。"
+          运行日志：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          ## 怎么修
+
+          1. 浏览器登录 https://glados.network/console
+          2. F12 → Network → 随便点一个请求 → 复制 Cookie 里 \`ko=...\` 那一整段
+          3. 打开 https://github.com/liziliangli73-max/checkin/settings/secrets/actions
+          4. 更新 \`GLADOS_COOKIE\` → 粘贴新值 → Save
+          5. 到 Actions 手动 Run workflow 验证一次"
           fi
 
       - name: 标记本次失败
