@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-31T14:54:01Z",
+  "updated": "2026-10-31T16:14:32Z",
   "account": {
     "email": "2011961478@qq.com"
   },
@@ -92,7 +92,16 @@
       "balance": 31.0,
       "streak": 4,
       "leftDays": 10.0
+    },
+    {
+      "date": "2026-11-01",
+      "ok": false,
+      "change": 0.0,
+      "error": "没有权限",
+      "balance": 31.0,
+      "streak": 4,
+      "leftDays": 10.0
     }
   ],
-  "checked": "2026-10-31T14:54:01Z"
+  "checked": "2026-10-31T16:14:32Z"
 }
